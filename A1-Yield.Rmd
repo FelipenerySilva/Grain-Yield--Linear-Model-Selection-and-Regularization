@@ -1,0 +1,370 @@
+---
+title: "STAT6020 Assigment 1"
+author: "Felipe Nery Da Silva"
+date: "19/08/2021"
+output:
+  pdf_document: 
+    latex_engine: xelatex
+  html_document: default
+ 
+---
+
+```{r global-options, include=FALSE}
+knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='Figs/',
+                      echo=TRUE, warning=FALSE, message=FALSE)
+```
+
+# Grain Yield
+
+## Linear Model Selection and Regularization 
+
+The data set Yield.dat contains the yield of grain together with soil quality measurements
+at each of 215 sites in a portion of a field. Figure 1 shows the location of the measurement
+sites. The measurement sites are identified in the data set by a variable, x, indicating the
+measurement location along a particular east-west transect. 
+
+
+We are interested in determining which soil nutrients are most important in determining grain 
+yield.
+```{r}
+#Read the data and set the colum names
+gy <- read.table("Yield.dat")
+names(gy) <- c("x", "y", "yield", "B", "Ca", "Cu", "Fe",
+               "K", "Mg", "Mn", "Na", "P", "Zn")
+```
+
+Each measurement location is approximately 12.2m apart. The 8 transects, identified by
+a variable, y, are approximately 48.8m apart. At harvest time, the harvesting machine was 
+driven along each transect stopping each 12.2m to measure the yield of grain for that part 
+of the field in bushels/acre. Measurements of 10 soil nutrients in parts per million (ppm) 
+are made at each location: Boron (B), Calcium (Ca), Copper (Cu), Iron (Fe), Potassium (K), 
+Magnesium (Mg), Manganese (Mn), Sodium (Na), Phosphorus (P), and Zinc (Zn). As can be seen 
+in Figure 1, there were a number of points in the site location grid where data was not 
+available.
+
+```{r}
+# create basic plot
+plot(I((y-1)*48.8)~I((x-1)*12.2), data=gy, xlab="east (metres)", type="n",
+ylab="north (metres)", xlim=c(-10,360), ylim=c(-10,360))
+
+# add grid lines
+abline(v=(1:28-1)*12.2, h=(1:8-1)*48.8, col="grey")
+
+# add secondary axes
+axis(side=3, at=(1:28-1)*12.2, labels=1:28, line=0, cex.axis=0.7, mgp=c(3,1,0))
+mtext("x", side=3, line=1, cex=0.7, adj=1)
+axis(side=4, at=(1:8-1)*48.8, labels=1:8, line=0, cex.axis=0.7, mgp=c(3,1,0))
+mtext("y", side=4, line=1, cex=0.7, adj=1)
+
+# plot the site locations
+points(I((y-1)*48.8)~I((x-1)*12.2), gy, pch=19)
+```
+Figure 1: Soil measurement sites
+
+## Preliminary exploration of the data
+
+```{r}
+#First we used the matrix scatterplots function 
+
+pairs(yield ~ B + Ca + Cu + Fe + K + Mg + Mn + Na + P + Zn, gy, lower.panel = panel.smooth,
+      col = "blue",                                            # Change color
+      pch = 19,                                                # Change shape of points
+      cex = 0.5,                                               # Change size of points
+      labels = c("Yield","Boron","Calcium",
+                 "Copper","Iron","Potassium","Magnesium", "Manganese",
+                 "Sodium", "Phosphorus", "Zinc"),  # Change labels  
+      gap = 0.2,                                               # Change gaps in between
+      main = "Scatterplot Matrix of `Grain Yield`")
+```
+The matrix scatterplot function helps to quickly visualize the relationships between grain yield and soil nutrients. 
+From a first visual look, the scatterplots suggest that the soil nutrients Boron(B), Calcium(Ca) and Sodium(Na) do 
+not have a relationship with grain yield. On the other hand, Copper(Cu), Iron(Fe), Potassium(K), Magnesium(Mg), 
+Manganese(Mn), Phosphorus(P), and Zinc(Zn) are showing some thought of positive non linear trend.  
+
+To confirm my interpretation I looked at each individual plot from all soil nutrients variables.
+
+```{r}
+plot(gy[c("Cu","yield")])
+```
+The plot shows a positive non-linear relationship between the soil nutrient Copper(Cu)
+and grain yield.
+
+```{r}
+plot(gy[c("Fe","yield")])
+```
+The plot shows a non-linear and weak relationship between the soil nutrient Iron(Fe) and grain yield. 
+It is clear the presence of outliers on the data.    
+
+```{r}
+plot(gy[c("K","yield")])
+```
+The soil nutrient potassium(K) appears to have a positive non-linear relationship with grain yield. 
+It also shows more than half of the data are clustered in the upper left side of the graph and the 
+presence of outliers. 
+
+```{r}
+plot(gy[c("Mg","yield")])
+```
+The soil nutrient Magnesium appears to have a positive non-linear relationship with grain yield. 
+It is also clear the presence of clusters. 
+
+```{r}
+plot(gy[c("Mn","yield")])
+```
+The Manganese(Mn) soil nutrient plot shows a weak  non-linear relationship with grain yield. It is clear
+the presence of patterns and outliers.
+
+```{r}
+plot(gy[c("P","yield")])
+```
+The plot from soil nutrient Phosphorus(P) shows a positive non-linear relationship with grain yield.
+Most of the data is clustered in the upper left side of the graph and there are outliers.
+
+```{r}
+plot(gy[c("Zn","yield")])
+```
+The Zinc(Zn) soil nutrient plot confirms a positive non-linear relationship with grain yield.
+It is also clear the presence of outliers.
+
+The next Plot sequence are the last three soil nutrients that appeared not to have an influence in grain yield.
+```{r}
+#Boron
+plot(gy[c("B","yield")])
+```
+It appears that Boron has a weak to no relationship with grain yield.
+
+```{r}
+#Calcium
+plot(gy[c("Ca","yield")])
+```
+The data is really clustered and there are a number of outliers. A relationship does not appear to exist.
+
+```{r}
+#Sodium
+plot(gy[c("Na","yield")])
+```
+The soil nutrient Sodium shows a non-linear very weak positive relationship with grain yield. The presence of patterns and outliers is very clear.
+
+The first seven plots(Cooper, Iron, Potassium, Magnesium, Manganese, Phosphorus and Zinc) showed a slightly non-linear relationship with grain yield and the last three soil nutrients are not appearing to have an influence in grain yield. However, further investigation is necessary to confirm my visual diagnostic.
+
+## Multiple Linear Regression
+
+
+```{r}
+#Fitted multiple linear regression model and summary function
+gylm <- lm(yield ~ B+Ca+Cu+Fe+K+Mg+Mn+Na+
+             P+Zn, data = gy)
+summary(gylm)
+```   
+
+The summary output of the regression suggests the model is statistically significant p-value: < 2.2e-16. With 10% significance level only the predictors Copper(Cu) (p=0.0003), Iron(Fe) (p=0.000377) appear to have a statistically significant relationship with grain yield. 
+
+To check how linear is the relationship with the predictors I have inspected the residual diagnostic plot.
+
+```{r}
+plot(gylm, which = 1)
+```
+The plot confirms a weak non-linear relationship. There is a non-linear trend in the two ends of the line and some patters in the middle. The presence of outliers could be the issue with linearity and should be investigated.
+
+## Outlier investigation
+
+```{r}
+# filtering out observation 200 and refitting the model 
+gy2 <- gy[-c(200),] 
+gy2lm <- lm(yield ~ B+Ca+Cu+Fe+K+Mg+Mn+Na+P+Zn, data = gy2)
+summary(gy2lm)
+```
+At a first look the model had an improvement. The low p-value: < 2.2e-16 stayed the 
+same very low, the R-squared:0.4889 slightly increased and the Residual standard 
+error: 14.36 decreased as expected. 
+
+The removal of obs=200 is reasonable as it appears to be an outlier. The observation 
+should be looked at carefully and it is useful to do some modeling without that observation 
+however you don’t just get rid of data because that makes the model fit the data better. 
+
+In addition, this time when using a 10% significance the soil nutrient phosphorus(P) is added 
+to have a statistically significant relationship with grain yield.
+ 
+## Model transformations of some of the soil nutrient predictor variables.
+
+Note: these transformations were suggested by inspection of the individual bivariate 
+relationships between each of the predictors and the yield. Each suggested transformation 
+improved the linearity of the bivariate relationship
+```{r}
+#transformed new regression model
+gy3lm <- lm(yield ~ B+I(1/Ca)+log(Cu)+log(Fe)+I(1/K)+I(1/Mg)+log(Mn)+Na+log(P)
+            +log(Zn+1), data = gy2)
+summary(gy3lm)
+```
+
+The transformation of the predictors appears to have improved the model. With the same 
+near zero p-value: < 2.2e-16, an increase in R-squared:  0.5616 and a lower residual 
+standard error: 13.62. However, the interpretation of the model has become more complex.
+
+When using a 10% significance level the transformed soil nutrients 1/(Ca), log(Cu), 
+I(1/K), I(1/Mg), and log(P) are statistically significant related with grain yield. 
+
+When compared with the previous model the number of statistically significant predictors 
+that have a relationship with grain yield increased to 5 and the there is an 
+improvement in R^2 = 0.5616. 
+
+
+## Subset Selection
+
+### Forward stepwise selection 
+```{r}
+#forward stepwise selection approach to choose an appropriate subset from the set 
+#of predictor variables previously used.
+library(leaps) #required library
+fssgy <- regsubsets(yield ~ B+I(1/Ca)+log(Cu)+log(Fe)+I(1/K)+I(1/Mg)+log(Mn)+Na
+                    +log(P)+log(Zn+1), data = gy2, nvmax = 10,  method = "forward")
+summary(fssgy)
+```
+```{r}
+fss.sum <- summary(fssgy)
+fss.sum$adjr2
+```
+```{r}
+plot(summary(fssgy)$adjr2)
+```
+After using the forward stepwise selection the best model is the one that contains 6 variables. We 
+can confirm it by checking the plot results and the summary with be biggest Adjusted R-squared result. 
+
+## Using the subset selected with 6 variables
+
+```{r}
+#subset selected variables model
+gy4lm <- lm(yield ~ I(1/Ca)+log(Cu)+I(1/K)+I(1/Mg)+log(P)+log(Zn + 1), data = gy2)
+summary(gy4lm)
+```
+The very small p-value: < 2.2e-16 confirms that the new linear model is statistically significant. 
+It rejects the null hypothesis and again confirms the relationship between grain yield and the 
+transformed predictor variables. 
+
+### Interpretation of the parameters:
+
+*The intercept = 130.495 is the value of grain yield when all the other transformed soil nutrients are
+equal to zero. 
+*The transformed Calcium I(1/Ca) is statistically significant to have a relationship with grain yield, 
+when considering a 10% significance level (p=0.0758). For every one unit increase of the reciprocal 
+transformation of Ca and all the others variables are hold constant the average increase in grain yield 
+is equal to 18466.34  bushels/acre. 
+*For every one unit change in log of Copper(Cu) the average increase in grain yield is 14.989 bushels/acre, 
+when all the others predictors are constant. 
+*For I(1/K) when considering a 10% significance level. One unit increase of the reciprocal transformation 
+in Potassium(K) and all the others predictors are hold constant the average decrease in grain yield is
+-699.95 bushels/acre. 
+*Much similar happened to the reciprocal transformation of Magnesium(Mg), for every one unit change in 
+the reciprocal transformation of Magnesium and all the others variables are hold constant, grain yield 
+decreases on average by -3671.036. 
+*The log of Phosphorus(P) when all the others predictors are hold constant, one unit change will on 
+average increase grain yield by 6.015 bushels/acre. 
+* The log(Zn + 1) is not statistically significant to have a relationship with grain yield.
+
+
+## Model Regularisation
+
+```{r}
+
+library(glmnet)
+
+X <- model.matrix(yield ~ B+I(1/Ca)+log(Cu)+log(Fe)+I(1/K)+I(1/Mg)+log(Mn)+Na+log(P)
+                  +log(Zn+1), data = gy2)
+X <- X[,-1]
+
+Y <- gy2$yield
+
+lasso.gy <- glmnet(X, Y, alpha = 1)
+
+#Plot the resulting object to display the model coefficients as a function
+#of their L1 norm.
+plot(lasso.gy, label = TRUE)
+```
+
+On the top axes in each point we have the number of non zero variables in the model. 
+First the model selected 9 variables until the second point, it decreases to 8 variables 
+and than increases back to 9 variables just before it drops down to 0. 
+On the Y axes is the values of the coefficients and on the X axes the L1 Norm is the sum of the 
+coefficients absolute values. 
+The colorful lines represents each variable(or coefficient) from the model, labeled by order of 
+placement in the model.
+In this case a number of variables shrink to zero and as lambda increases all the predictor variables
+coefficient shrink to zero. 
+
+The coefficient plot outcome is hard to interpret because of the axes scale. Depending on the 
+choice of tuning parameter, some of the coefficients are exactly equal to zero
+```{r}
+# extracting relevant info from lasso object
+l1norm <- colSums(abs(lasso.gy$beta))
+vnames <- lasso.gy$beta@Dimnames[[1]]
+par(mfrow=c(5,2), mar=c(3,4,2,1)+0.1)
+# plot separate coefficient profile for each variable
+for (i in 1:10) {
+plot(x=l1norm, xlab="", y=lasso.gy$beta[i,], ylab=bquote(beta[.(i)]),
+type="l")
+abline(v=max(l1norm[which(lasso.gy$beta[i,]==0)]), lty="dotted", col="red")
+legend("topright", legend=vnames[i], bty="n")
+text(x=max(l1norm[which(lasso.gy$beta[i,]==0)]), y=par("usr")[4],
+label=as.character(prettyNum(max(l1norm[which(lasso.gy$beta[i,]==0)]))),
+col="red", xpd=NA, pos=3, cex=0.7)
+}
+title(xlab="L1 Norm", outer=TRUE)
+```
+
+## Cross-Validation 
+
+```{r}
+#Use cv.glmnet() to explore how the estimated Mean Squared Error changes as a
+#function of the shrinkage parameter, λ.
+cv_gy <- cv.glmnet(X,Y,alpha=1) 
+plot(cv_gy)
+
+```
+The selected lambda and its log are: 
+```{r}
+cv_gy$lambda.1se
+```
+```{r}
+log(cv_gy$lambda.1se)
+```
+This value is correspondent to the right dashed line in the plot. It is the suggested trade 
+off where there is still a level of regularization at the price of a slightly increase in the
+Mean-Squared Error. 
+The left hand dotted line refers to the value of lambda at which the measured MSE (actually 
+the average of 10 cross validated MSEs ) is minimum.
+The 10 fold cross-validation splits the data randomly. So every time the cv.glmnet() function 
+is run we will get slightly different results.
+
+### The model coefficients for the selected model are:
+```{r}
+coef(cv_gy)
+```
+
+
+## Fitting a multiple regression model using only those variables suggested by the LASSO
+
+```{r}
+#Fit a multiple regression model using only those variables suggested by the LASSO
+gy.lassolm <- lm(yield ~ log(Cu)+I(1/K)+log(P)+log(Zn + 1), data = gy2)
+summary(gy.lassolm)
+```
+
+The criteria for estimating the model coefficients from multiple regression model and 
+the LASSO model coefficients are different. The multiple regression model minimizes the 
+RSS(Residual of Sum of Squares) while the Lasso model works by adding a penalty component 
+to the optimization criteria (RSS) and uses its absolute values. 
+The Lasso model shrinks the coefficients estimates towards zero (will generally be 
+smaller than coefficients in an ordinary regression model coefficients with the same 
+predictors). Its penalty has the effect of forcing some of the coefficient estimates 
+to be exactly equal to zero when the tuning parameter "lambda" is sufficiently large.  
+
+
+
+
+
+
+
+
+
+
+
