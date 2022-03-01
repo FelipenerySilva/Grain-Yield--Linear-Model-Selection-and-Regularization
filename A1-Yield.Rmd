@@ -284,15 +284,16 @@ plot(lasso.gy, label = TRUE)
 On the top axes in each point we have the number of non zero variables in the model. 
 First the model selected 9 variables until the second point, it decreases to 8 variables 
 and than increases back to 9 variables just before it drops down to 0. 
-On the Y axes is the values of the coefficients and on the X axes the L1 Norm is the sum of the 
+On the Y axes are the values of the coefficients and on the X axes the L1 Norm is the sum of the 
 coefficients absolute values. 
 The colorful lines represents each variable(or coefficient) from the model, labeled by order of 
 placement in the model.
 In this case a number of variables shrink to zero and as lambda increases all the predictor variables
 coefficient shrink to zero. 
 
-The coefficient plot outcome is hard to interpret because of the axes scale. Depending on the 
-choice of tuning parameter, some of the coefficients are exactly equal to zero
+The coefficient plot outcome is hard to see because of the axes scale. Depending on the 
+choice of tuning parameter, some of the coefficients are exactly equal to zero. Here are 
+the plot from separate coefficient profile for each variable.
 ```{r}
 # extracting relevant info from lasso object
 l1norm <- colSums(abs(lasso.gy$beta))
@@ -310,6 +311,8 @@ col="red", xpd=NA, pos=3, cex=0.7)
 }
 title(xlab="L1 Norm", outer=TRUE)
 ```
+The coefficients of the log of Copper(Cu) and the log(Zn + 1) are the last ones to 
+shrink to zero and are considered the most important.
 
 ## Cross-Validation 
 
@@ -327,7 +330,7 @@ cv_gy$lambda.1se
 ```{r}
 log(cv_gy$lambda.1se)
 ```
-This value is correspondent to the right dashed line in the plot. It is the suggested trade 
+This value corresponds to the right dashed line in the plot. It is the suggested trade 
 off where there is still a level of regularization at the price of a slightly increase in the
 Mean-Squared Error. 
 The left hand dotted line refers to the value of lambda at which the measured MSE (actually 
@@ -352,7 +355,8 @@ summary(gy.lassolm)
 The criteria for estimating the model coefficients from multiple regression model and 
 the LASSO model coefficients are different. The multiple regression model minimizes the 
 RSS(Residual of Sum of Squares) while the Lasso model works by adding a penalty component 
-to the optimization criteria (RSS) and uses its absolute values. 
+to the optimization criteria (RSS) and uses its absolute values. Notice the multiple 
+regression model variables coefficients are bigger than Lasso. 
 The Lasso model shrinks the coefficients estimates towards zero (will generally be 
 smaller than coefficients in an ordinary regression model coefficients with the same 
 predictors). Its penalty has the effect of forcing some of the coefficient estimates 
