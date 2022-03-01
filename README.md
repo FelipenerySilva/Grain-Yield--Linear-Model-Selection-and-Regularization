@@ -18,11 +18,11 @@ We are interested in determining which soil nutrients are most important in dete
 yield.
 
 Applied methods:
-    ## Multiple Linear Regression;
-    ### Outlier investigation;
-    ### Model transformation;
-    ### Subset Selection (Forward stepwise selection); 
     
-    ## Model Regularisation;
-    ### Lasso (using library(glmnet);
-    ### Cross-Validation ;
+    -- Multiple Linear Regression;
+    -- Outlier investigation;
+    -- Model transformation;
+    -- Subset Selection (Forward stepwise selection);  
+    -- Model Regularisation;
+    -- Lasso (using library(glmnet);
+    -- Cross-Validation ;
