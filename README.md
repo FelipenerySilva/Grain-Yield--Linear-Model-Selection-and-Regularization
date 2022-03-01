@@ -1,7 +1,8 @@
-# Grain Yield Linear Model Selection and Regularization
- Multiple Linear Regression, Subset selection and Model Regularisation to determine which soil nutrients are most important in determining grain yield.
+# Multiple Linear Model Selection and Regularization:Grain Yield Project
+ In this project I applied Multiple Linear Regression, Subset Selection and Model Regularisation to determine 
+ which soil nutrients are most important in determining grain yield.
 
-Grain Yield
+
 
 The data set Yield.dat contains the yield of grain together with soil quality measurements
 at each of 215 sites in a portion of a field. Figure 1 shows the location of the measurement
