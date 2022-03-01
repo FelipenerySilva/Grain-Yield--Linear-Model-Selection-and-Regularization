@@ -1,6 +1,14 @@
 # Linear Model Selection and Regularization: Grain Yield Project
  
-This project is part of the Predictive Analytics course from the University of Newcastle (Uon). 
+
+   **Multiple Linear Regression;**
+   **Outlier investigation;**
+   **Model transformation;**
+   **Subset Selection (Forward stepwise);**  
+   
+   **Model Regularisation:**
+   **Lasso (using library(glmnet);**
+   **Cross-Validation; **
  
 The data set Yield.dat contains the yield of grain together with soil quality measurements
 at each of 215 sites in a portion of a field. Figure 1 shows the location of the measurement
@@ -17,12 +25,6 @@ points in the site location grid where data was not available.
 We are interested in determining which soil nutrients are most important in determining grain
 yield.
 
-Applied methods:
-    
-    -- Multiple Linear Regression;
-    -- Outlier investigation;
-    -- Model transformation;
-    -- Subset Selection (Forward stepwise selection);  
-    -- Model Regularisation;
-    -- Lasso (using library(glmnet);
-    -- Cross-Validation ;
+
+
+This project was part of my Predictive Analytics course from the University of Newcastle (Uon). 
