@@ -7,8 +7,8 @@
    **Subset Selection (Forward stepwise);**  
    
    **Model Regularisation:**
-   **Lasso (using library(glmnet);**
-   **Cross-Validation; **
+   **Lasso (libraryglmnet);**
+   **Cross-Validation;**
  
 The data set Yield.dat contains the yield of grain together with soil quality measurements
 at each of 215 sites in a portion of a field. Figure 1 shows the location of the measurement
