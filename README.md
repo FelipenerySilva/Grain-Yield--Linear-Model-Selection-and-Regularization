@@ -7,7 +7,7 @@
    **Subset Selection (Forward stepwise);**  
    
    **Model Regularisation:**
-   **Lasso (libraryglmnet);**
+   **Lasso (library glmnet);**
    **Cross-Validation;**
  
 We are interested in determining which soil nutrients are most important in determining grain
@@ -27,6 +27,6 @@ points in the site location grid where data was not available.
 
 
 This project was part of the Predictive Analytics course from the University of Newcastle (Uon) 
-Master's of Data Science Degree. 
+Master of Data Science Degree. 
 
 R Studio was used to prepare an R Markdown document from which I created a single pdf document.
