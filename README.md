@@ -10,6 +10,9 @@
    **Lasso (libraryglmnet);**
    **Cross-Validation;**
  
+We are interested in determining which soil nutrients are most important in determining grain
+yield.
+
 The data set Yield.dat contains the yield of grain together with soil quality measurements
 at each of 215 sites in a portion of a field. Figure 1 shows the location of the measurement
 sites. The measurement sites are identified in the data set by a variable, x, indicating the
@@ -22,9 +25,6 @@ of 10 soil nutrients in parts per million (ppm) are made at each location: Boron
 (Na), Phosphorus (P), and Zinc (Zn). As can be seen in Figure 1, there were a number of
 points in the site location grid where data was not available.
 
-We are interested in determining which soil nutrients are most important in determining grain
-yield.
 
-
-
-This project was part of my Predictive Analytics course from the University of Newcastle (Uon). 
+This project was part of the Predictive Analytics course from the University of Newcastle (Uon). 
+R Studio was used to prepare a R Markdown document from which I created a single pdf document.
