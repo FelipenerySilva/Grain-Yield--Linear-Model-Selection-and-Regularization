@@ -26,7 +26,7 @@ of 10 soil nutrients in parts per million (ppm) are made at each location: Boron
 points in the site location grid where data was not available.
 
 
-This project was part of the Predictive Analytics course from the University of Newcastle (Uon) 
+This project was part of my Predictive Analytics course from the University of Newcastle (Uon) 
 Master of Data Science Degree. 
 
 R Studio was used to prepare an R Markdown document from which I created a single pdf document.
